@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+
+{% block content %}
+
+
+
+<div class="row">
+	<aside class="col-lg-8">
+<div class="card p-4">
+    <div class="card" style="width: 65rem ;">
+		<h5 class="card-title">Billing Address</h5>
+        <div class="card-body">
+          
+			<p class="card-text mb-0">{{order.full_name}}</p>
+			<p class="card-text mb-0">{{order.full_address}}</p>
+			<p class="card-text mb-0">{{order.city}}, {{order.state}}</p>
+			<p class="card-text mb-0">{{order.country}}</p>
+			<p class="card-text mb-0">{{order.email}}</p>
+			<p class="card-text mb-0">{{order.phone}}</p>
+			{% if order.order_note %}
+			<b>Order Note: </b> {{order.order_note}}
+			{% endif %}
+
+        </div>
+      </div>
+</div>
+
+<div class="card p-4">
+    <div class="card" style="width: 65rem ;">
+        <div class="card-body">
+          <h5 class="card-title">Payment Method</h5>
+          <p class="card-text">PayPal</p>
+        </div>
+      </div>
+</div>
+
+<div class="card p-4">
+    <div class="card" style="width: 65rem ;">
+        <div class="card-body">
+          <h5 class="card-title">Review Cart</h5>
+			
+		  <table class="table table-borderless table-shopping-cart">
+			<thead class="text-muted">
+				<tr class="small text-uppercase">
+					<th scope="col">Product</th>
+					<th scope="col" width="120">Quantity</th>
+					<th scope="col" width="120">Price</th>
+			
+				  </tr>
+			</thead>
+			<tbody>
+			
+				{% for cart_item in cart_items %}
+			<tr>
+				<td>
+					<figure class="itemside align-items-center">
+						<div height = "150px" widget = "75px" align = "center" class="aside"><img height = "150px" widget = "75px" align = "left" src={{ cart_item.product.images.url }} class="img-sm"></div>
+						<figcaption class="info">
+							<a href={{ cart_item.product.get_url }} class="title text-dark">{{ cart_item.product.product_name }}</a>
+							<p class="text-muted small">
+								{% if cart_item.variations %}
+								{% for each_product_variation in cart_item.variations.all %}
+									{{ each_product_variation.variation_category | capfirst }} : {{ each_product_variation.variation_value | capfirst }} <br>
+								{% endfor %}
+								{% endif %}
+								
+							</p>
+						</figcaption>
+					</figure>
+				</td>
+				<td>
+					<!-- col.// -->
+							<label for="">{{cart_item.quantity}}</label>
+				</td>
+				<td> 
+					<!-- col.// -->
+								<div class="col"> 
+									<div class="input-group input-spinner">
+										<div class="input-group-prepend">
+									   
+										</div>
+										<input type="text" class="form-control"  value="{{ cart_item.quantity }}">
+										<div class="input-group-append">
+										
+										</div>
+									</div> <!-- input-group.// -->
+								</div> <!-- col.// -->
+				</td>
+				<td> 
+					<div align = "center" class="price-wrap"> 
+						<var class="price">${{ cart_item.sub_total }}</var> 
+						<small class="text-muted"> ${{cart_item.product.price}} each </small> 
+					</div> <!-- price-wrap .// -->
+				
+			</tr>
+			
+			
+			{% endfor %}
+			
+			
+			</tbody>
+			</table>
+
+
+        </div>
+      </div>
+</div>
+
+	<!-- card.// -->
+
+	</aside> <!-- col.// -->
+	<aside class="col-lg-4">
+
+		<div class="card">
+		<div class="card-body">
+
+			<dl class="dlist-align">
+			  <dt class="text-center">Total price:</dt>
+			  <dd class="text-center">${{ total }}</dd>
+			</dl>
+			<dl class="dlist-align">
+			  <dt class="text-center">Tax:</dt>
+			  <dd class="text-center"> ${{ tax }}</dd>
+			</dl>
+			<dl class="dlist-align">
+			  <dt class="text-center">Total:</dt>
+			  <dd class="text-center text-dark b"><strong>${{ grand_total }}</strong></dd>
+			</dl>
+			<hr>
+			<p class="text-center mb-3">
+				<img src="{% static './images/misc/payments.png' %}" height="26">
+			</p>
+			
+			
+
+
+			<div align = "center" > 
+
+				<form action = {% url 'payments' %} method="POST">
+					{% csrf_token %}
+
+					<input type="hidden" name="payment_method" value="custom_payment" >
+					<input type="hidden" name="status" value="complete" >
+					<input type="hidden" name = "order_id" value = {{ order.order_number }}>
+
+				<button class="glow-on-hover" type="submit">Make Payment</button>
+
+				</form>
+			</div>
+
+
+
+		</div> <!-- card-body.// -->
+		</div> <!-- card.// -->
+
+</aside> <!-- col.// -->
+
+
+</div> <!-- row.// -->
+
+
+
+
+
+{% endblock %}
